@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Product Database</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            background: #020603;
+        }
+
+        body {
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                "Liberation Mono",
+                monospace;
+
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 42px 28px;
+            background-color: transparent;
+            color: #b9c8bd;
+            position: relative;
+        }
+
+
+        /* MATRIX BINARY RAIN */
+
+        #binaryRain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -1;
+            background: #020603;
+        }
+
+
+        /* FAINT MONITOR SCAN LINES */
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(255, 255, 255, 0.012),
+                    rgba(255, 255, 255, 0.012) 1px,
+                    transparent 1px,
+                    transparent 4px
+                );
+
+            z-index: 9999;
+        }
+
+
+        /* MAIN TITLE */
+
+        h1 {
+            margin: 0 0 34px;
+            color: #00ff41;
+            font-size: 29px;
+            font-weight: 700;
+            letter-spacing: 2px;
+
+            text-shadow:
+                0 0 10px
+                rgba(0, 255, 65, 0.35);
+        }
+
+        h1::before {
+            content: "> ";
+            color: #00b832;
+        }
+
+
+        /* SECTION TITLES */
+
+        h2 {
+            margin: 0 0 20px;
+            color: #65ff88;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        h2::before {
+            content: "// ";
+            color: #008f28;
+        }
+
+
+        /* CARDS */
+
+        .card {
+            position: relative;
+
+            background:
+                rgba(4, 12, 7, 0.91);
+
+            padding: 24px;
+            margin-bottom: 18px;
+
+            border:
+                1px solid #123a1d;
+
+            border-left:
+                2px solid #00c936;
+
+            border-radius: 0;
+
+            box-shadow:
+                inset 0 0 28px
+                rgba(0, 255, 65, 0.018);
+        }
+
+
+        /* LOGIN STATUS */
+
+        #loginStatus {
+            margin-top: 10px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: #718a77;
+        }
+
+        #loginStatus.authenticated {
+            color: #00ff41;
+        }
+
+
+        /* INPUTS */
+
+        input {
+            height: 42px;
+            padding: 0 12px;
+            margin: 0 8px 10px 0;
+            background: #010402;
+            color: #8dffa8;
+            caret-color: #00ff41;
+
+            border:
+                1px solid #174923;
+
+            border-radius: 0;
+
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        input::placeholder {
+            color: #3d6948;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00ff41;
+
+            box-shadow:
+                0 0 8px
+                rgba(0, 255, 65, 0.22);
+        }
+
+
+        /* BUTTONS */
+
+        button {
+            min-height: 40px;
+            padding: 0 16px;
+            margin: 0 6px 8px 0;
+            background: #041a09;
+            color: #00ff41;
+
+            border:
+                1px solid #00b832;
+
+            border-radius: 0;
+
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #00ff41;
+            color: #001904;
+            border-color: #00ff41;
+
+            box-shadow:
+                0 0 12px
+                rgba(0, 255, 65, 0.28);
+        }
+
+
+        /* DELETE BUTTON */
+
+        .delete-button {
+            background: transparent;
+            color: #ff6767;
+            border-color: #6e2525;
+        }
+
+        .delete-button:hover {
+            background: #ff4c4c;
+            color: #100000;
+            border-color: #ff4c4c;
+        }
+
+
+        /* CANCEL BUTTON */
+
+        .cancel-button {
+            background: transparent;
+            color: #718a77;
+            border-color: #294a31;
+        }
+
+        .cancel-button:hover {
+            background: #18301e;
+            color: #c5d8ca;
+            border-color: #3d6d49;
+            box-shadow: none;
+        }
+
+
+        /* EDIT AREA */
+
+        #editSection {
+            display: none;
+
+            border-left:
+                2px solid #00ff41;
+        }
+
+
+        /* PRODUCT LIST */
+
+        #productList {
+            margin-top: 16px;
+        }
+
+        .product {
+            position: relative;
+            padding: 18px 20px;
+            margin-bottom: 9px;
+
+            background:
+                rgba(3, 9, 5, 0.94);
+
+            border:
+                1px solid #102f18;
+
+            border-left:
+                2px solid #008f28;
+
+            color: #66816d;
+            line-height: 1.75;
+            font-size: 13px;
+        }
+
+        .product::before {
+            content: "[ACTIVE]";
+            display: block;
+            margin-bottom: 5px;
+            color: #00b832;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        .product strong {
+            display: inline-block;
+            margin-bottom: 4px;
+            color: #c7ffd4;
+            font-size: 16px;
+            font-weight: 600;
+
+            text-shadow:
+                0 0 7px
+                rgba(0, 255, 65, 0.12);
+        }
+
+        .product button {
+            margin-top: 12px;
+        }
+
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            body {
+                padding: 25px 15px;
+            }
+
+            input {
+                display: block;
+                width: 100%;
+                margin-right: 0;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- MATRIX BACKGROUND -->
+
+    <canvas id="binaryRain"></canvas>
+
+
+    <h1>PRODUCT DATABASE</h1>
+
+
+    <!-- ============================= -->
+    <!-- LOGIN -->
+    <!-- ============================= -->
+
+    <div class="card">
+
+        <h2>Login</h2>
+
+        <input
+            id="loginUsername"
+            type="text"
+            placeholder="Username"
+        >
+
+        <input
+            id="loginPassword"
+            type="password"
+            placeholder="Password"
+        >
+
+        <button onclick="loginUser()">
+            LOGIN
+        </button>
+
+        <button
+            id="logoutButton"
+            class="cancel-button"
+            onclick="logoutUser()"
+            style="display: none;"
+        >
+            LOGOUT
+        </button>
+
+        <div id="loginStatus">
+            NOT AUTHENTICATED
+        </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- ADD PRODUCT -->
+    <!-- ============================= -->
+
+    <div class="card">
+
+        <h2>Add Product</h2>
+
+        <input
+            id="productName"
+            type="text"
+            placeholder="Product name"
+        >
+
+        <input
+            id="productPrice"
+            type="number"
+            step="0.01"
+            placeholder="Price"
+        >
+
+        <input
+            id="productQuantity"
+            type="number"
+            placeholder="Quantity"
+        >
+
+        <input
+            id="productPartNumber"
+            type="text"
+            placeholder="Part number (optional)"
+        >
+
+        <button onclick="addProduct()">
+            ADD PRODUCT
+        </button>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- EDIT PRODUCT -->
+    <!-- ============================= -->
+
+    <div
+        class="card"
+        id="editSection"
+    >
+
+        <h2>Edit Product</h2>
+
+        <input
+            id="editName"
+            type="text"
+        >
+
+        <input
+            id="editPrice"
+            type="number"
+            step="0.01"
+        >
+
+        <input
+            id="editQuantity"
+            type="number"
+        >
+
+        <input
+            id="editPartNumber"
+            type="text"
+            placeholder="Part number"
+        >
+
+        <button onclick="saveProduct()">
+            SAVE CHANGES
+        </button>
+
+        <button
+            class="cancel-button"
+            onclick="cancelEdit()"
+        >
+            CANCEL
+        </button>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- PRODUCTS -->
+    <!-- ============================= -->
+
+    <div class="card">
+
+        <h2>Products</h2>
+
+        <button onclick="loadProducts()">
+            REFRESH PRODUCTS
+        </button>
+
+        <div id="productList">
+            LOGIN REQUIRED
+        </div>
+
+    </div>
+
+
+
+<script>
+
+
+    const API_URL =
+        "http://127.0.0.1:5008";
+
+
+    let accessToken =
+        localStorage.getItem(
+            "access_token"
+        );
+
+
+    let originalProductName =
+        "";
+
+
+    // ==================================
+    // AUTHORIZATION HEADERS
+    // ==================================
+
+    function authHeaders(
+        includeJson = false
+    ) {
+
+        const headers = {};
+
+        if (accessToken) {
+
+            headers["Authorization"] =
+                `Bearer ${accessToken}`;
+
+        }
+
+        if (includeJson) {
+
+            headers["Content-Type"] =
+                "application/json";
+
+        }
+
+        return headers;
+
+    }
+
+
+    // ==================================
+    // LOGIN STATUS
+    // ==================================
+
+    function updateLoginStatus() {
+
+        const loginStatus =
+            document.getElementById(
+                "loginStatus"
+            );
+
+        const logoutButton =
+            document.getElementById(
+                "logoutButton"
+            );
+
+
+        if (accessToken) {
+
+            loginStatus.textContent =
+                "AUTHENTICATED";
+
+            loginStatus.classList.add(
+                "authenticated"
+            );
+
+            logoutButton.style.display =
+                "inline-block";
+
+        }
+
+        else {
+
+            loginStatus.textContent =
+                "NOT AUTHENTICATED";
+
+            loginStatus.classList.remove(
+                "authenticated"
+            );
+
+            logoutButton.style.display =
+                "none";
+
+        }
+
+    }
+
+
+    // ==================================
+    // LOGIN
+    // ==================================
+
+    async function loginUser() {
+
+        const username =
+            document.getElementById(
+                "loginUsername"
+            ).value;
+
+        const password =
+            document.getElementById(
+                "loginPassword"
+            ).value;
+
+
+        if (!username || !password) {
+
+            alert(
+                "Enter username and password"
+            );
+
+            return;
+
+        }
+
+
+        const formData =
+            new URLSearchParams();
+
+
+        formData.append(
+            "username",
+            username
+        );
+
+
+        formData.append(
+            "password",
+            password
+        );
+
+
+        const response =
+            await fetch(
+
+                `${API_URL}/login`,
+
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/x-www-form-urlencoded"
+
+                    },
+
+                    body:
+                        formData
+
+                }
+
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                result.detail ||
+                "Login failed"
+            );
+
+            return;
+
+        }
+
+
+        accessToken =
+            result.access_token;
+
+
+        localStorage.setItem(
+            "access_token",
+            accessToken
+        );
+
+
+        document.getElementById(
+            "loginPassword"
+        ).value = "";
+
+
+        updateLoginStatus();
+
+
+        loadProducts();
+
+    }
+
+
+    // ==================================
+    // LOGOUT
+    // ==================================
+
+    function logoutUser() {
+
+        accessToken =
+            null;
+
+
+        localStorage.removeItem(
+            "access_token"
+        );
+
+
+        document.getElementById(
+            "productList"
+        ).innerHTML =
+            "LOGIN REQUIRED";
+
+
+        cancelEdit();
+
+
+        updateLoginStatus();
+
+    }
+
+
+    // ==================================
+    // MATRIX BINARY RAIN
+    // ==================================
+
+    const canvas =
+        document.getElementById(
+            "binaryRain"
+        );
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    const fontSize =
+        16;
+
+
+    let drops =
+        [];
+
+
+    let lastRainFrame =
+        0;
+
+
+    const rainSpeed =
+        42;
+
+
+    function setupBinaryRain() {
+
+        const dpr =
+            window.devicePixelRatio || 1;
+
+
+        canvas.width =
+            window.innerWidth * dpr;
+
+
+        canvas.height =
+            window.innerHeight * dpr;
+
+
+        canvas.style.width =
+            `${window.innerWidth}px`;
+
+
+        canvas.style.height =
+            `${window.innerHeight}px`;
+
+
+        ctx.setTransform(
+            dpr,
+            0,
+            0,
+            dpr,
+            0,
+            0
+        );
+
+
+        const columns =
+            Math.floor(
+                window.innerWidth /
+                fontSize
+            );
+
+
+        drops =
+            Array(columns)
+            .fill(0)
+            .map(
+
+                () =>
+                    Math.random() *
+                    -60
+
+            );
+
+
+        ctx.fillStyle =
+            "#020603";
+
+
+        ctx.fillRect(
+            0,
+            0,
+            window.innerWidth,
+            window.innerHeight
+        );
+
+    }
+
+
+    function drawBinaryRain(
+        timestamp
+    ) {
+
+        requestAnimationFrame(
+            drawBinaryRain
+        );
+
+
+        if (
+            timestamp -
+            lastRainFrame <
+            rainSpeed
+        ) {
+
+            return;
+
+        }
+
+
+        lastRainFrame =
+            timestamp;
+
+
+        ctx.fillStyle =
+            "rgba(2, 6, 3, 0.14)";
+
+
+        ctx.fillRect(
+            0,
+            0,
+            window.innerWidth,
+            window.innerHeight
+        );
+
+
+        ctx.font =
+            `${fontSize}px monospace`;
+
+
+        for (
+            let i = 0;
+            i < drops.length;
+            i++
+        ) {
+
+            if (
+                Math.random() >
+                0.48
+            ) {
+
+                const digit =
+
+                    Math.random() >
+                    0.5
+
+                        ? "1"
+
+                        : "0";
+
+
+                if (
+                    Math.random() >
+                    0.92
+                ) {
+
+                    ctx.fillStyle =
+                        "#caffd5";
+
+                }
+
+                else {
+
+                    ctx.fillStyle =
+                        "#00c936";
+
+                }
+
+
+                ctx.fillText(
+                    digit,
+                    i * fontSize,
+                    drops[i] *
+                    fontSize
+                );
+
+            }
+
+
+            if (
+                drops[i] *
+                fontSize >
+                window.innerHeight
+            ) {
+
+                if (
+                    Math.random() >
+                    0.94
+                ) {
+
+                    drops[i] =
+                        Math.random() *
+                        -40;
+
+                }
+
+            }
+
+
+            drops[i] +=
+                0.65;
+
+        }
+
+    }
+
+
+    window.addEventListener(
+        "resize",
+        setupBinaryRain
+    );
+
+
+    setupBinaryRain();
+
+
+    requestAnimationFrame(
+        drawBinaryRain
+    );
+
+
+    // ==================================
+    // GET ALL PRODUCTS
+    // ==================================
+
+    async function loadProducts() {
+
+        if (!accessToken) {
+
+            document.getElementById(
+                "productList"
+            ).innerHTML =
+                "LOGIN REQUIRED";
+
+            return;
+
+        }
+
+
+        const response =
+            await fetch(
+
+                `${API_URL}/products/`,
+
+                {
+
+                    headers:
+                        authHeaders()
+
+                }
+
+            );
+
+
+        if (response.status === 401) {
+
+            accessToken =
+                null;
+
+
+            localStorage.removeItem(
+                "access_token"
+            );
+
+
+            updateLoginStatus();
+
+
+            document.getElementById(
+                "productList"
+            ).innerHTML =
+                "SESSION EXPIRED - LOGIN REQUIRED";
+
+
+            return;
+
+        }
+
+
+        const products =
+            await response.json();
+
+
+        const productList =
+            document.getElementById(
+                "productList"
+            );
+
+
+        productList.innerHTML =
+            "";
+
+
+        products.forEach(
+
+            product => {
+
+                const productDiv =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                productDiv.className =
+                    "product";
+
+
+                productDiv.innerHTML = `
+
+                    <strong>
+                        ${product.product_name}
+                    </strong>
+
+                    <br>
+
+                    PRICE:
+                    $${product.price}
+
+                    <br>
+
+                    QUANTITY:
+                    ${product.quantity}
+
+                    <br>
+
+                    PART NUMBER:
+                    ${product.part_number ?? "AUTO"}
+
+                    <br>
+
+                    <button
+                        onclick="
+                            editProduct(
+                                '${product.product_name}'
+                            )
+                        "
+                    >
+                        EDIT
+                    </button>
+
+                    <button
+                        class="delete-button"
+                        onclick="
+                            deleteProduct(
+                                '${product.product_name}'
+                            )
+                        "
+                    >
+                        DELETE
+                    </button>
+
+                `;
+
+
+                productList.appendChild(
+                    productDiv
+                );
+
+            }
+
+        );
+
+    }
+
+
+    // ==================================
+    // POST NEW PRODUCT
+    // ==================================
+
+    async function addProduct() {
+
+        if (!accessToken) {
+
+            alert(
+                "Please login first"
+            );
+
+            return;
+
+        }
+
+
+        const productName =
+            document.getElementById(
+                "productName"
+            ).value;
+
+
+        const productPrice =
+            document.getElementById(
+                "productPrice"
+            ).value;
+
+
+        const productQuantity =
+            document.getElementById(
+                "productQuantity"
+            ).value;
+
+
+        const productPartNumber =
+            document.getElementById(
+                "productPartNumber"
+            ).value;
+
+
+        const newProduct = {
+
+            product_name:
+                productName,
+
+            price:
+                Number(
+                    productPrice
+                ),
+
+            quantity:
+                Number(
+                    productQuantity
+                ),
+
+            part_number:
+                productPartNumber || null
+
+        };
+
+
+        const response =
+            await fetch(
+
+                `${API_URL}/products/`,
+
+                {
+
+                    method:
+                        "POST",
+
+                    headers:
+                        authHeaders(true),
+
+                    body:
+                        JSON.stringify(
+                            newProduct
+                        )
+
+                }
+
+            );
+
+
+        if (response.status === 401) {
+
+            alert(
+                "Session expired. Please login again."
+            );
+
+            logoutUser();
+
+            return;
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            result.error
+        ) {
+
+            alert(
+                result.error
+            );
+
+            return;
+
+        }
+
+
+        document.getElementById(
+            "productName"
+        ).value = "";
+
+
+        document.getElementById(
+            "productPrice"
+        ).value = "";
+
+
+        document.getElementById(
+            "productQuantity"
+        ).value = "";
+
+
+        document.getElementById(
+            "productPartNumber"
+        ).value = "";
+
+
+        loadProducts();
+
+    }
+
+
+    // ==================================
+    // GET ONE PRODUCT FOR EDITING
+    // ==================================
+
+    async function editProduct(
+        productName
+    ) {
+
+        if (!accessToken) {
+
+            alert(
+                "Please login first"
+            );
+
+            return;
+
+        }
+
+
+        const response =
+            await fetch(
+
+                `${API_URL}/products/${
+                    encodeURIComponent(
+                        productName
+                    )
+                }`,
+
+                {
+
+                    headers:
+                        authHeaders()
+
+                }
+
+            );
+
+
+        if (response.status === 401) {
+
+            alert(
+                "Session expired. Please login again."
+            );
+
+            logoutUser();
+
+            return;
+
+        }
+
+
+        const product =
+            await response.json();
+
+
+        if (
+            product.error
+        ) {
+
+            alert(
+                product.error
+            );
+
+            return;
+
+        }
+
+
+        originalProductName =
+            product.product_name;
+
+
+        document.getElementById(
+            "editName"
+        ).value =
+            product.product_name;
+
+
+        document.getElementById(
+            "editPrice"
+        ).value =
+            product.price;
+
+
+        document.getElementById(
+            "editQuantity"
+        ).value =
+            product.quantity;
+
+
+        document.getElementById(
+            "editPartNumber"
+        ).value =
+            product.part_number ?? "";
+
+
+        document.getElementById(
+            "editSection"
+        ).style.display =
+            "block";
+
+    }
+
+
+    // ==================================
+    // PUT / UPDATE PRODUCT
+    // ==================================
+
+    async function saveProduct() {
+
+        if (!accessToken) {
+
+            alert(
+                "Please login first"
+            );
+
+            return;
+
+        }
+
+
+        const productName =
+            document.getElementById(
+                "editName"
+            ).value;
+
+
+        const newPrice =
+            document.getElementById(
+                "editPrice"
+            ).value;
+
+
+        const newQuantity =
+            document.getElementById(
+                "editQuantity"
+            ).value;
+
+
+        const newPartNumber =
+            document.getElementById(
+                "editPartNumber"
+            ).value;
+
+
+        const updatedProduct = {
+
+            product_name:
+                productName,
+
+            price:
+                Number(
+                    newPrice
+                ),
+
+            quantity:
+                Number(
+                    newQuantity
+                ),
+
+            part_number:
+                newPartNumber || null
+
+        };
+
+
+        const response =
+            await fetch(
+
+                `${API_URL}/products/${
+                    encodeURIComponent(
+                        originalProductName
+                    )
+                }`,
+
+                {
+
+                    method:
+                        "PUT",
+
+                    headers:
+                        authHeaders(true),
+
+                    body:
+                        JSON.stringify(
+                            updatedProduct
+                        )
+
+                }
+
+            );
+
+
+        if (response.status === 401) {
+
+            alert(
+                "Session expired. Please login again."
+            );
+
+            logoutUser();
+
+            return;
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            result.error
+        ) {
+
+            alert(
+                result.error
+            );
+
+            return;
+
+        }
+
+
+        cancelEdit();
+
+
+        loadProducts();
+
+    }
+
+
+    // ==================================
+    // DELETE PRODUCT
+    // ==================================
+
+    async function deleteProduct(
+        productName
+    ) {
+
+        if (!accessToken) {
+
+            alert(
+                "Please login first"
+            );
+
+            return;
+
+        }
+
+
+        const confirmed =
+            confirm(
+                `Delete ${productName}?`
+            );
+
+
+        if (
+            !confirmed
+        ) {
+
+            return;
+
+        }
+
+
+        const response =
+            await fetch(
+
+                `${API_URL}/products/${
+                    encodeURIComponent(
+                        productName
+                    )
+                }`,
+
+                {
+
+                    method:
+                        "DELETE",
+
+                    headers:
+                        authHeaders()
+
+                }
+
+            );
+
+
+        if (response.status === 401) {
+
+            alert(
+                "Session expired. Please login again."
+            );
+
+            logoutUser();
+
+            return;
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (
+            result.error
+        ) {
+
+            alert(
+                result.error
+            );
+
+            return;
+
+        }
+
+
+        alert(
+            result.complete
+        );
+
+
+        loadProducts();
+
+    }
+
+
+    // ==================================
+    // CLOSE EDIT FORM
+    // ==================================
+
+    function cancelEdit() {
+
+        document.getElementById(
+            "editSection"
+        ).style.display =
+            "none";
+
+    }
+
+
+    // ==================================
+    // INITIAL PAGE LOAD
+    // ==================================
+
+    updateLoginStatus();
+
+
+    if (accessToken) {
+
+        loadProducts();
+
+    }
+
+
+</script>
+
+
+</body>
+
+</html>
