@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import Optional
 import sqlite3
 #import the router from products_api.py where the 
-from users import router as users_router, get_current_user
+from users import router as users_router, get_current_user, require_admin
 
 
 class Product(BaseModel):
@@ -160,7 +160,7 @@ def edit_product(product_name: str, product: Product, current_user = Depends(get
 
 
 @app.delete("/products/{product_name}")
-def delete_product(product_name: str, current_user = Depends(get_current_user)):
+def delete_product(product_name: str, current_user = Depends(require_admin)):
     connection = sqlite3.connect("products.db")
     cursor = connection.cursor()
 

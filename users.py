@@ -5,10 +5,15 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 import jwt
 import os
+from dotenv import load_dotenv
 
 from datetime import datetime, timedelta, timezone
 
+load_dotenv()
+
 SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY environment variabe is not set.")
 ALGORITHM = "HS256"
 
 
